@@ -4,8 +4,12 @@
   "description": "",
   "main": "ViajanteDeComercio.js",
   "scripts": {
+    "start": "node ViajanteDeComercio.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "fast-xml-parser": "^4.0.8"
+  }
 }

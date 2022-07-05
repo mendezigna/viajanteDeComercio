@@ -1,10 +1,10 @@
-function ViajanteDeComercio(v, matrizCompleta){
+function ViajanteDeComercio(v, matrizCompleta){ //O(n)
 	const actual = v[0]
 	const res = []
 	res.push(actual.numero)
 	actual.visitado = true
 	let visitados = 1
-	while(visitados < v.length){
+	while(visitados < v.length){ // O(n)
 		const adyacentes = actual.adyacentes.filter(ady => !v[ady].visitado).sort((a, b) => matrizCompleta[a][actual.numero] - matrizCompleta[b][actual.numero]) // O(n * log n)
 		const siguiente = obtenerRandom(adyacentes, v)
 		res.push(siguiente.numero)
@@ -16,12 +16,11 @@ function ViajanteDeComercio(v, matrizCompleta){
 
 function obtenerRandom(adyacentes, v){ // O(1)
 	const randomInt = Math.floor(
-		Math.random() * (adyacentes.length / (adyacentes.length < 10 ? 2 : 10)) // devuelve los 10% primeros es decir 10 de 100.
+		Math.random() * (adyacentes.length / (adyacentes.length < 10 ? 2 : 10)) // devuelve un numero entre los 10% primeros es decir 10 de 100.
 	)																			// En caso que la cantidad de adyacentes sea menor a 10 devuelve un numero random entre 0 y la mitad de la cantidad de adyacentes
 	return v[adyacentes[randomInt]]
 }
 
-// retorna una tupla con (solucion, costo)
 function BusquedaLocal(solucion, matrizCompleta){ // O(n)
 	let vecindarioPeor = false
 	let solucionActual = [solucion, costo(solucion, matrizCompleta)]
@@ -32,15 +31,24 @@ function BusquedaLocal(solucion, matrizCompleta){ // O(n)
 			const costoNuevo = costoAlIntercambiar(i, nodoSiguiente, solucionActual, matrizCompleta)
 			if(costoNuevo < mejorSolucionVecindario[1]){
 				mejorSolucionVecindario = [swap(i, nodoSiguiente, solucionActual[0]), costoNuevo]
+				break
 			}
 		}
-		if(mejorSolucionVecindario[1] >= solucionActual[1]){
+		if(!mejoro(solucionActual[1], mejorSolucionVecindario[1])){
+			if(solucionActual[1] > mejorSolucionVecindario[1]){
+				solucionActual = mejorSolucionVecindario
+			}
 			vecindarioPeor = true
 		} else {
 			solucionActual = mejorSolucionVecindario
 		}
 	}
 	return solucionActual
+}
+
+function mejoro(costoActual, costoNuevo){ //retorna true si la solucion nueva es mejor en un 5% o mas
+	const mejoraEsperada = (costoActual * 5) / 100
+	return (costoActual - costoNuevo) >= mejoraEsperada
 }
 
 function swap(i, j, solucion){ //O(1)
@@ -72,15 +80,54 @@ function mod(n, m) { // usado debido a que el operador % en javascript no funcio
 	return ((n % m) + m) % m;
 }
 
-const grafo = [{visitado: false, adyacentes: [0, 1, 2, 3, 4], numero: 0}, {visitado: false, adyacentes: [0, 1, 2, 3, 4], numero: 1}, {visitado: false, numero: 2, adyacentes: [0, 1, 2, 3, 4]}, {visitado: false, numero: 3, adyacentes: [0, 1, 2, 3, 4]}, {visitado: false, adyacentes: [0, 1, 2, 3, 4], numero: 4}]
-const matriz =  [ 
-					[0, 6, 5, 4, 5], 
-				  	[6, 0, 1, 2, 4], 
-				  	[5, 1, 0, 3, 2], 
-				  	[4, 2, 3, 0, 1],
-					[5, 4, 2, 1, 0]
-				]
-const res = ViajanteDeComercio(grafo, matriz)
-const resBusqueda = BusquedaLocal([...res], matriz)
+function floyd(vertices, aristas) {
+	let dist = {};
+	for (let i = 0; i < vertices.length; i++) {
+		dist[vertices[i]] = {};
+		aristas.filter(a => a.verticeOrigen == i).forEach(a => (dist[vertices[i]][a.verticeDestino] = a.peso));
+		aristas.filter(a => a.verticeDestino == i).forEach(a => (dist[vertices[i]][a.verticeOrigen] = a.peso));
+		vertices.forEach(n => {
+			if (dist[vertices[i]][n] == undefined){
+				dist[vertices[i]][n] = Infinity;
+			}
+			if (vertices[i] === n){
+				dist[vertices[i]][n] = 0
+			};
+		});
+	}
+	vertices.forEach(i => {
+	   vertices.forEach(j => {
+			vertices.forEach(k => {
+				if (dist[i][k] + dist[k][j] < dist[i][j]){
+					dist[i][j] = dist[i][k] + dist[k][j];
+				}
+			});
+		});
+	});
+	return Object.keys(dist).map(v => Object.values(dist[v]));
+ }
 
-console.log(res, resBusqueda)
+// const grafo = [{visitado: false, adyacentes: [1, 2, 3, 4, 5], numero: 0}, {visitado: false, adyacentes: [0, 2, 3, 4, 5], numero: 1}, {visitado: false, numero: 2, adyacentes: [0, 1, 3, 4, 5]}, {visitado: false, numero: 3, adyacentes: [0, 1, 2, 4, 5]}, {visitado: false, adyacentes: [0, 1, 2, 3, 5], numero: 4},
+// 			   {visitado: false, adyacentes: [0, 1, 2, 3, 4], numero: 5}]
+// const matriz =  [ 
+// 					[0, 6, 5, 4, 5, 3],
+// 				  	[6, 0, 1, 2, 4, 1], 
+// 				  	[5, 1, 0, 3, 2, 6], 
+// 				  	[4, 2, 3, 0, 1, 5],
+// 					[5, 4, 2, 1, 0, 3],
+// 					[3, 1, 6, 5, 3, 0]
+// 				]
+// const res = ViajanteDeComercio(grafo, matriz)
+// const resBusqueda = BusquedaLocal([...res], matriz)
+
+// const vertices = [0, 1, 2, 3, 4]
+// const matriz =  [ 
+// 					[0, 4, 5, -1, 8],
+// 					[4, 0, 1, 6, -1],
+// 					[5, 1, 0, -1, 3],
+// 					[-1, 6,-1, 0, 2],
+// 					[8, -1, 3, 2, 0],
+// 				]
+// const aristas = [{verticeOrigen: 0, verticeDestino: 2, peso: 5}, {verticeOrigen: 0, verticeDestino: 4, peso: 8}, {verticeOrigen: 2, verticeDestino: 4, peso: 3}, {verticeOrigen: 1, verticeDestino: 2, peso: 1}, 
+// 				 {verticeOrigen: 1, verticeDestino: 0, peso: 4}, {verticeOrigen: 3, verticeDestino: 4, peso: 2}, {verticeOrigen: 3, verticeDestino: 1, peso: 6}]
+// console.log(floyd(vertices, aristas))
