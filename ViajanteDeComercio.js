@@ -1,3 +1,5 @@
+const importar = require('./importarDatos')
+
 function ViajanteDeComercio(v, matrizCompleta){ //O(n)
 	const actual = v[0]
 	const res = []
@@ -131,3 +133,4 @@ function floyd(vertices, aristas) {
 // const aristas = [{verticeOrigen: 0, verticeDestino: 2, peso: 5}, {verticeOrigen: 0, verticeDestino: 4, peso: 8}, {verticeOrigen: 2, verticeDestino: 4, peso: 3}, {verticeOrigen: 1, verticeDestino: 2, peso: 1}, 
 // 				 {verticeOrigen: 1, verticeDestino: 0, peso: 4}, {verticeOrigen: 3, verticeDestino: 4, peso: 2}, {verticeOrigen: 3, verticeDestino: 1, peso: 6}]
 // console.log(floyd(vertices, aristas))
+// importar('./grafos/att48.xml')
