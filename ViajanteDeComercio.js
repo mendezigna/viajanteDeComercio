@@ -1,6 +1,6 @@
-const importar = require('./importarDatos')
+const {importar, guardarResultado} = require('./importarDatos')
 
-function grasp(fileDir, iteraciones){// O(n^3 * log n)
+function grasp(fileDir, iteraciones){// O(n³ * log n)
 	const datos = importar(fileDir)
 	const vertices = []
 	let aristas = []
@@ -11,7 +11,7 @@ function grasp(fileDir, iteraciones){// O(n^3 * log n)
 	const matrizCompleta = floyd(vertices, aristas) 
 	let iteracionActual = 0
 	let mejorSolucion = BusquedaLocal(ViajanteDeComercio(vertices.map(i => {return {visitado: false, numero: i}}), matrizCompleta), matrizCompleta)
-	while(iteracionActual < iteraciones){// O(n^3 * log n)
+	while(iteracionActual < iteraciones){// O(n³ * log n)
 		const solucionActual = BusquedaLocal(ViajanteDeComercio(vertices.map(i => {return {visitado: false, numero: i}}), matrizCompleta), matrizCompleta)
 		if(mejorSolucion[1] > solucionActual[1]){
 			mejorSolucion = solucionActual
@@ -19,16 +19,16 @@ function grasp(fileDir, iteraciones){// O(n^3 * log n)
 		console.log(mejorSolucion, iteracionActual)
 		iteracionActual++
 	}
-	return mejorSolucion
+	guardarResultado(mejorSolucion)
 }
 
-function ViajanteDeComercio(v, matrizCompleta){ // O(n^2 * log n)
+function ViajanteDeComercio(v, matrizCompleta){ // O(n² * log n)
 	const actual = v[Math.floor(Math.random() * (v.length))]
 	const res = []
 	res.push(actual.numero)
 	actual.visitado = true
 	let visitados = 1
-	while(visitados < v.length){ // O(n^2 * log n)
+	while(visitados < v.length){ // O(n² * log n)
 		const adyacentes = [...Array(v.length).keys()].filter(ady => !v[ady].visitado).sort((a, b) => matrizCompleta[a][actual.numero] - matrizCompleta[b][actual.numero]) // O(n * log n)
 		const siguiente = obtenerRandom(adyacentes, v)
 		res.push(siguiente.numero)
@@ -156,4 +156,4 @@ function floyd(vertices, aristas) { // O(n³)
 // 				 {verticeOrigen: 1, verticeDestino: 0, peso: 4}, {verticeOrigen: 3, verticeDestino: 4, peso: 2}, {verticeOrigen: 3, verticeDestino: 1, peso: 6}]
 // console.log(floyd(vertices, aristas))
 // importar('./grafos/att48.xml')
-console.log(grasp('./grafos/gr137.xml', 50000))
+grasp('./grafos/gr137.xml', 5000)
