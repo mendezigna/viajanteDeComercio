@@ -1,5 +1,30 @@
 const importar = require('./importarDatos')
 
+function grasp(fileDir){
+	const datos = importar(fileDir)
+	const vertices = []
+	let aristas = []
+	datos.travellingSalesmanProblemInstance.graph.vertex.forEach((e, i) => {
+		vertices.push(i)
+		aristas = aristas.concat(e.edge.map(e => {return {peso: parseFloat(e.cost), verticeOrigen: i, verticeDestino: parseInt(e['$t'])}}))
+	})
+	const matrizCompleta = floyd(vertices, aristas)
+	let solucionPeor = false
+	let mejorSolucion
+	while(!solucionPeor){
+		const solucionActual = BusquedaLocal(ViajanteDeComercio(vertices.map(i => {return {visitado: false, numero: i}}), matrizCompleta), matrizCompleta)
+		if(!mejoro(mejorSolucion[1], solucionActual[1])){
+			if(mejorSolucion[1] > solucionActual[1]){
+				mejorSolucion = solucionActual
+			}
+			vecindarioPeor = true
+		} else {
+			mejorSolucion = solucionActual
+		}
+	}
+	return mejorSolucion
+}
+
 function ViajanteDeComercio(v, matrizCompleta){ //O(n)
 	const actual = v[0]
 	const res = []
@@ -7,7 +32,7 @@ function ViajanteDeComercio(v, matrizCompleta){ //O(n)
 	actual.visitado = true
 	let visitados = 1
 	while(visitados < v.length){ // O(n)
-		const adyacentes = actual.adyacentes.filter(ady => !v[ady].visitado).sort((a, b) => matrizCompleta[a][actual.numero] - matrizCompleta[b][actual.numero]) // O(n * log n)
+		const adyacentes = [...Array(v.length).keys()].filter(ady => !v[ady].visitado).sort((a, b) => matrizCompleta[a][actual.numero] - matrizCompleta[b][actual.numero]) // O(n * log n)
 		const siguiente = obtenerRandom(adyacentes, v)
 		res.push(siguiente.numero)
 		siguiente.visitado = true
@@ -134,3 +159,4 @@ function floyd(vertices, aristas) {
 // 				 {verticeOrigen: 1, verticeDestino: 0, peso: 4}, {verticeOrigen: 3, verticeDestino: 4, peso: 2}, {verticeOrigen: 3, verticeDestino: 1, peso: 6}]
 // console.log(floyd(vertices, aristas))
 // importar('./grafos/att48.xml')
+console.log(grasp('./grafos/att48.xml'))
