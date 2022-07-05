@@ -1,6 +1,6 @@
 const importar = require('./importarDatos')
 
-function grasp(fileDir){
+function grasp(fileDir, iteraciones){// O(n^3 * log n)
 	const datos = importar(fileDir)
 	const vertices = []
 	let aristas = []
@@ -8,30 +8,27 @@ function grasp(fileDir){
 		vertices.push(i)
 		aristas = aristas.concat(e.edge.map(e => {return {peso: parseFloat(e.cost), verticeOrigen: i, verticeDestino: parseInt(e['$t'])}}))
 	})
-	const matrizCompleta = floyd(vertices, aristas)
-	let solucionPeor = false
-	let mejorSolucion
-	while(!solucionPeor){
+	const matrizCompleta = floyd(vertices, aristas) 
+	let iteracionActual = 0
+	let mejorSolucion = BusquedaLocal(ViajanteDeComercio(vertices.map(i => {return {visitado: false, numero: i}}), matrizCompleta), matrizCompleta)
+	while(iteracionActual < iteraciones){// O(n^3 * log n)
 		const solucionActual = BusquedaLocal(ViajanteDeComercio(vertices.map(i => {return {visitado: false, numero: i}}), matrizCompleta), matrizCompleta)
-		if(!mejoro(mejorSolucion[1], solucionActual[1])){
-			if(mejorSolucion[1] > solucionActual[1]){
-				mejorSolucion = solucionActual
-			}
-			vecindarioPeor = true
-		} else {
+		if(mejorSolucion[1] > solucionActual[1]){
 			mejorSolucion = solucionActual
 		}
+		console.log(mejorSolucion, iteracionActual)
+		iteracionActual++
 	}
 	return mejorSolucion
 }
 
-function ViajanteDeComercio(v, matrizCompleta){ //O(n)
-	const actual = v[0]
+function ViajanteDeComercio(v, matrizCompleta){ // O(n^2 * log n)
+	const actual = v[Math.floor(Math.random() * (v.length))]
 	const res = []
 	res.push(actual.numero)
 	actual.visitado = true
 	let visitados = 1
-	while(visitados < v.length){ // O(n)
+	while(visitados < v.length){ // O(n^2 * log n)
 		const adyacentes = [...Array(v.length).keys()].filter(ady => !v[ady].visitado).sort((a, b) => matrizCompleta[a][actual.numero] - matrizCompleta[b][actual.numero]) // O(n * log n)
 		const siguiente = obtenerRandom(adyacentes, v)
 		res.push(siguiente.numero)
@@ -51,7 +48,7 @@ function obtenerRandom(adyacentes, v){ // O(1)
 function BusquedaLocal(solucion, matrizCompleta){ // O(n)
 	let vecindarioPeor = false
 	let solucionActual = [solucion, costo(solucion, matrizCompleta)]
-	while(!vecindarioPeor){ // O(n)
+	while(!vecindarioPeor){ // O(n * k)
 		let mejorSolucionVecindario = solucionActual
 		for (let i = 0; i < solucion.length; i++) { // 0(n)
 			const nodoSiguiente = (i + 1) % solucion.length
@@ -73,8 +70,8 @@ function BusquedaLocal(solucion, matrizCompleta){ // O(n)
 	return solucionActual
 }
 
-function mejoro(costoActual, costoNuevo){ //retorna true si la solucion nueva es mejor en un 5% o mas
-	const mejoraEsperada = (costoActual * 5) / 100
+function mejoro(costoActual, costoNuevo){ // O(1) retorna true si la solucion nueva es mejor en un 5% o mas
+	const mejoraEsperada = (costoActual * 2) / 100
 	return (costoActual - costoNuevo) >= mejoraEsperada
 }
 
@@ -103,11 +100,11 @@ function costoAlIntercambiar(i, j, solucionCosto, matrizCompleta){ // O(1)
 	const costo2 = matrizCompleta[solucionActual[i]][nodoSiguiente] - matrizCompleta[solucionActual[j]][nodoSiguiente]
 	return costoActual + costo1 + costo2
 }
-function mod(n, m) { // usado debido a que el operador % en javascript no funciona con numeros negativos
+function mod(n, m) { // O(1) usado debido a que el operador % en javascript no funciona con numeros negativos
 	return ((n % m) + m) % m;
 }
 
-function floyd(vertices, aristas) {
+function floyd(vertices, aristas) { // O(n³)
 	let dist = {};
 	for (let i = 0; i < vertices.length; i++) {
 		dist[vertices[i]] = {};
@@ -159,4 +156,4 @@ function floyd(vertices, aristas) {
 // 				 {verticeOrigen: 1, verticeDestino: 0, peso: 4}, {verticeOrigen: 3, verticeDestino: 4, peso: 2}, {verticeOrigen: 3, verticeDestino: 1, peso: 6}]
 // console.log(floyd(vertices, aristas))
 // importar('./grafos/att48.xml')
-console.log(grasp('./grafos/att48.xml'))
+console.log(grasp('./grafos/gr137.xml', 50000))
