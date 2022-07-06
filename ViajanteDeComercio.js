@@ -9,13 +9,14 @@ function grasp(fileDir, iteraciones){// O(n³ * log n)
 		aristas = aristas.concat(e.edge.map(e => {return {peso: parseFloat(e.cost), verticeOrigen: i, verticeDestino: parseInt(e['$t'])}}))
 	})
 	const matrizCompleta = floyd(vertices, aristas) 
-	let iteracionActual = 0
 	let mejorSolucion = BusquedaLocal(ViajanteDeComercio(vertices.map(i => {return {visitado: false, numero: i}}), matrizCompleta), matrizCompleta)
+	console.log("Iteracion: ", 0, "Costo Total: ", mejorSolucion[1])
+	let iteracionActual = 1
 	while(iteracionActual < iteraciones){// O(n³ * log n)
 		const solucionActual = BusquedaLocal(ViajanteDeComercio(vertices.map(i => {return {visitado: false, numero: i}}), matrizCompleta), matrizCompleta)
 		if(mejorSolucion[1] > solucionActual[1]){
 			mejorSolucion = solucionActual
-			console.log(mejorSolucion[1], iteracionActual)
+			console.log("Iteracion: ", iteracionActual, "Costo Total: ", mejorSolucion[1])
 		}
 		iteracionActual++
 	}
@@ -31,9 +32,6 @@ function ViajanteDeComercio(v, matrizCompleta){ // O(n² * log n)
 	while(visitados < v.length){ // O(n² * log n)
 		const adyacentes = [...Array(v.length).keys()].filter(ady => !v[ady].visitado).sort((a, b) => matrizCompleta[a][actual.numero] - matrizCompleta[b][actual.numero]) // O(n * log n)
 		const siguiente = obtenerRandom(adyacentes, v)
-		// console.log("actual", actual.numero)
-		// console.log("siguiente", siguiente.numero, )
-		// console.log("posibilidades: ", adyacentes.map(it => {return {peso: matrizCompleta[actual.numero][it], numero: it}}))
 		res.push(siguiente.numero)
 		siguiente.visitado = true
 		visitados++
@@ -49,7 +47,7 @@ function obtenerRandom(adyacentes, v){ // O(1)
 	return v[adyacentes[randomInt]]
 }
 
-function BusquedaLocal(solucion, matrizCompleta){ // O(n)
+function BusquedaLocal(solucion, matrizCompleta){ // O(n²)
 	let vecindarioPeor = false
 	let solucionActual = [solucion, costo(solucion, matrizCompleta)]
 	while(!vecindarioPeor){ // O(n²)
@@ -159,4 +157,4 @@ function floyd(vertices, aristas) { // O(n³)
 // 				 {verticeOrigen: 1, verticeDestino: 0, peso: 4}, {verticeOrigen: 3, verticeDestino: 4, peso: 2}, {verticeOrigen: 3, verticeDestino: 1, peso: 6}]
 // console.log(floyd(vertices, aristas))
 // importar('./grafos/att48.xml')
-grasp('./grafos/gr17.xml', 1000)
+grasp('./grafos/fri26.xml', 1000)
