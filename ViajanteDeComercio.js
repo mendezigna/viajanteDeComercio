@@ -15,15 +15,15 @@ function grasp(fileDir, iteraciones){// O(n³ * log n)
 		const solucionActual = BusquedaLocal(ViajanteDeComercio(vertices.map(i => {return {visitado: false, numero: i}}), matrizCompleta), matrizCompleta)
 		if(mejorSolucion[1] > solucionActual[1]){
 			mejorSolucion = solucionActual
+			console.log(mejorSolucion[1], iteracionActual)
 		}
-		console.log(mejorSolucion, iteracionActual)
 		iteracionActual++
 	}
 	guardarResultado(mejorSolucion)
 }
 
 function ViajanteDeComercio(v, matrizCompleta){ // O(n² * log n)
-	const actual = v[Math.floor(Math.random() * (v.length))]
+	let actual = v[Math.floor(Math.random() * (v.length))]
 	const res = []
 	res.push(actual.numero)
 	actual.visitado = true
@@ -31,9 +31,13 @@ function ViajanteDeComercio(v, matrizCompleta){ // O(n² * log n)
 	while(visitados < v.length){ // O(n² * log n)
 		const adyacentes = [...Array(v.length).keys()].filter(ady => !v[ady].visitado).sort((a, b) => matrizCompleta[a][actual.numero] - matrizCompleta[b][actual.numero]) // O(n * log n)
 		const siguiente = obtenerRandom(adyacentes, v)
+		// console.log("actual", actual.numero)
+		// console.log("siguiente", siguiente.numero, )
+		// console.log("posibilidades: ", adyacentes.map(it => {return {peso: matrizCompleta[actual.numero][it], numero: it}}))
 		res.push(siguiente.numero)
 		siguiente.visitado = true
 		visitados++
+		actual = siguiente
 	}
 	return res
 }
@@ -48,14 +52,13 @@ function obtenerRandom(adyacentes, v){ // O(1)
 function BusquedaLocal(solucion, matrizCompleta){ // O(n)
 	let vecindarioPeor = false
 	let solucionActual = [solucion, costo(solucion, matrizCompleta)]
-	while(!vecindarioPeor){ // O(n * k)
+	while(!vecindarioPeor){ // O(n²)
 		let mejorSolucionVecindario = solucionActual
 		for (let i = 0; i < solucion.length; i++) { // 0(n)
 			const nodoSiguiente = (i + 1) % solucion.length
 			const costoNuevo = costoAlIntercambiar(i, nodoSiguiente, solucionActual, matrizCompleta)
 			if(costoNuevo < mejorSolucionVecindario[1]){
-				mejorSolucionVecindario = [swap(i, nodoSiguiente, solucionActual[0]), costoNuevo]
-				break
+				mejorSolucionVecindario = [swap(i, nodoSiguiente, [...solucionActual[0]]), costoNuevo]
 			}
 		}
 		if(!mejoro(solucionActual[1], mejorSolucionVecindario[1])){
@@ -156,4 +159,4 @@ function floyd(vertices, aristas) { // O(n³)
 // 				 {verticeOrigen: 1, verticeDestino: 0, peso: 4}, {verticeOrigen: 3, verticeDestino: 4, peso: 2}, {verticeOrigen: 3, verticeDestino: 1, peso: 6}]
 // console.log(floyd(vertices, aristas))
 // importar('./grafos/att48.xml')
-grasp('./grafos/gr137.xml', 5000)
+grasp('./grafos/gr17.xml', 1000)
