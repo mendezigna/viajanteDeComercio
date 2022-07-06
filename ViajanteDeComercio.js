@@ -157,4 +157,4 @@ function floyd(vertices, aristas) { // O(n³)
 // 				 {verticeOrigen: 1, verticeDestino: 0, peso: 4}, {verticeOrigen: 3, verticeDestino: 4, peso: 2}, {verticeOrigen: 3, verticeDestino: 1, peso: 6}]
 // console.log(floyd(vertices, aristas))
 // importar('./grafos/att48.xml')
-grasp('./grafos/fri26.xml', 1000)
+grasp('./grafos/gr21.xml', 1000)
